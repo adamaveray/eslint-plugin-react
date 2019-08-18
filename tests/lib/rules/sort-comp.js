@@ -506,6 +506,35 @@ ruleTester.run('sort-comp', rule, {
         'everything-else'
       ]
     }]
+  }, {
+    code: `
+      // Static variables and methods are differentiated 
+      class MyComponent extends React.Component {
+        state = {};
+        static bar;
+        foo;
+        static baz() {
+          return null;
+        }
+        static propTypes;
+
+        render() {
+          return null;
+        }
+      }
+    `,
+    parser: parsers.BABEL_ESLINT,
+    options: [{
+      order: [
+        'state',
+        'static-variables',
+        'instance-variables',
+        'static-methods',
+        'lifecycle',
+        'render',
+        'everything-else'
+      ]
+    }]
   }],
 
   invalid: [{
@@ -731,6 +760,8 @@ ruleTester.run('sort-comp', rule, {
       order: [
         'instance-methods',
         'lifecycle',
+        'static-variables',
+        'static-methods',
         'everything-else',
         'render'
       ]
@@ -788,6 +819,24 @@ ruleTester.run('sort-comp', rule, {
       order: [
         'foo',
         'render'
+      ]
+    }]
+  }, {
+    code: `
+      // Static methods should appear in the correct order
+      class Hello extends React.Component {
+        foo() {}
+        static bar = () => {}
+        render() {}
+      }
+    `,
+    parser: parsers.BABEL_ESLINT,
+    errors: [{message: 'bar should be placed after render'}],
+    options: [{
+      order: [
+        'instance-methods',
+        'render',
+        'static-methods'
       ]
     }]
   }]
